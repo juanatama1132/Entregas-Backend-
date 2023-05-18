@@ -1,4 +1,3 @@
-import { query } from "express";
 import ProductModel from "./models/product.model.js";
 export class ProductMannager {
   constructor() {
@@ -21,12 +20,14 @@ export class ProductMannager {
     // }
   };
 
-  getProductById = async (id) => {
-    return await ProductModel.find({ _id: id }).lean();
+  getProductById = async (pId) => {
+    return await ProductModel.find({ _id: pId }).lean();
   };
+
   getProductByCode = async (pCode) => {
     await ProductModel.find({ code: pCode }).lean();
   };
+
   addProduct = async (product) => {
     // const { title, description, code, price, stock, category, thumbnails } =
     //   params;

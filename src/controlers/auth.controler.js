@@ -75,7 +75,15 @@ export class AuthClass {
       })
       .redirect("/login");
   };
-
+  TestLog = async (req, res) => {
+    req.logger.fatal("Fatal Error Message");
+    req.logger.error("Error Message");
+    req.logger.warning("Warning Message");
+    req.logger.info("Info Message");
+    req.logger.http("Http Message");
+    req.logger.degug("Debug Message");
+    res.send({ message: "Testeando Logger!!" });
+  };
   LogOut = async (req, res) => {
     req.session.destroy((err) => {
       if (err) return res.send({ status: "Logout error", message: err });

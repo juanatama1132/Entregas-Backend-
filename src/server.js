@@ -1,7 +1,6 @@
 import express, { urlencoded } from "express";
 import cookieParser from "cookie-parser";
 import handlebars from "express-handlebars";
-import logger from "morgan";
 
 import session from "express-session";
 import cors from "cors";
@@ -9,16 +8,17 @@ import cors from "cors";
 import { CfgObject } from "./config/config.js";
 
 import { Server } from "socket.io";
-import { HttpServer } from "http";
+import HttpServer from "http";
 import { initProductChatIo } from "./utils/productChatIo.js";
 import useRouter from "./routes/routes.js";
 import __dirname from "./dirname.js";
 
 import { initializePassport } from "./middleware/initialPassport.js";
 import passport from "passport";
+import { addLogger } from "./utils/logger.js";
 
 const app = express();
-const httpServer = new HttpServer(app);
+const httpServer = new HttpServer.Server(app);
 const io = new Server(httpServer);
 CfgObject.dbConnection();
 
@@ -31,7 +31,7 @@ app.use(cookieParser());
 initializePassport();
 app.use(passport.initialize());
 
-app.use(logger("dev"));
+app.use(addLogger);
 
 app.use(session(CfgObject.session));
 
