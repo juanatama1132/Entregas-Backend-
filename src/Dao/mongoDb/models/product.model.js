@@ -23,6 +23,10 @@ const ProductSchema = new Schema({
     type: String,
     required: true,
   },
+  owner: {
+    type: String,
+    default: "admin",
+  },
   thumbnails: { type: Array },
 });
 ProductSchema.plugin(mongoosePaginate);

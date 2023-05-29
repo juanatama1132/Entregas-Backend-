@@ -1,4 +1,5 @@
 import express, { urlencoded } from "express";
+import compression from "express-compression";
 import cookieParser from "cookie-parser";
 import handlebars from "express-handlebars";
 
@@ -27,7 +28,10 @@ app.use(express.json());
 app.use(urlencoded({ extended: true }));
 app.use(cors());
 app.use(cookieParser());
-
+app.use(compression({
+    brotli:{enabled:true,
+    zLib:{}}
+}))
 initializePassport();
 app.use(passport.initialize());
 

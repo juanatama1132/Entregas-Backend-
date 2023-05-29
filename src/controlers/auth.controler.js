@@ -1,8 +1,14 @@
 import { userService } from "../services/index.js";
 import { generateToken } from "../utils/jsonwt.js";
 import { isValidPassword, createHash } from "../utils/bCrypt.js";
+import SendmailTransport from "nodemailer/lib/sendmail-transport/index.js";
+import { sendMail } from "../utils/sendMail.js";
 
 export class AuthClass {
+  navLogIn = async (req, res) => {
+    res.status(200).render("login");
+  };
+
   LogIn = async (req, res) => {
     const { eMail, password } = req.body;
     const user = await userService.getUser(eMail);
@@ -18,11 +24,15 @@ export class AuthClass {
 
     const { password: pass, ...rest } = user;
     const token = generateToken(rest);
+
     res
       .cookie("coderCookieToken", token, { maxAge: 60 * 60 * 1000 })
       .status(200)
-      //.send({ status: "success", access_token, message: "LogIn Correcto" });
       .redirect("/api/products");
+  };
+
+  navRegister = async (req, res) => {
+    res.status(200).render("register");
   };
 
   Register = async (req, res) => {
@@ -50,9 +60,65 @@ export class AuthClass {
     });
   };
 
+  navSendRecoveryMail = async (req, res) => {
+    res.status(200).render("sendrecoverymail");
+  };
+
+  sendRecoveryMail = async (req, res) => {
+    const { eMail } = req.body;
+    const { password: pass, ...rest } = user;
+    const token = generateToken(rest, "1h");
+    //envio Mail con Link
+    const cfgMail = {
+      userMail: eMail,
+      subject: "Solicitud Recuperacion Password",
+      html: `<div>
+<h2>Acceso a Recuperar Passwurd</h2>
+<a href="http://localhost:${CfgObject.PORT}/restaurarpass?tk=${token}"><button>Recuperar Password</button></a>
+</div>`,
+    };
+    sendMail(cfgMail);
+  };
+
+  navRecoverPass = async (req, res) => {
+    const { tk } = req.params;
+    res
+      .cookie("coderCookieToken", tk, { maxAge: 60 * 60 * 1000 })
+      .status(200)
+      .render("recoverpass");
+  };
+
+  RecoverPass = async (req, res) => {
+    const eMail = req.user.eMail;
+    const { password, nwpassword } = req.body;
+    const user = await userService.getUser(eMail);
+    if (password !== nwpassword) {
+      return res
+        .status(401)
+        .send(
+          { status: "error", error: "El Password debe ser Diferente" }.render(
+            "recoverpass"
+          )
+        );
+    }
+
+    if (!isValidPassword(user, password)) {
+      user.password = createHash(password);
+      await user.save();
+    } else {
+      return res
+        .status(401)
+        .send(
+          { status: "error", error: "El Password debe ser Diferente" }.render(
+            "recoverpass"
+          )
+        );
+    }
+    //Validar PassWord
+  };
+
   RestorePwd = async (req, res) => {
     const { email, password } = req.body;
-
     const user = await userService.userExists(email);
 
     if (user == false) {
@@ -75,6 +141,7 @@ export class AuthClass {
       })
       .redirect("/login");
   };
+
   TestLog = async (req, res) => {
     req.logger.fatal("Fatal Error Message");
     req.logger.error("Error Message");
@@ -84,6 +151,7 @@ export class AuthClass {
     req.logger.degug("Debug Message");
     res.send({ message: "Testeando Logger!!" });
   };
+
   LogOut = async (req, res) => {
     req.session.destroy((err) => {
       if (err) return res.send({ status: "Logout error", message: err });

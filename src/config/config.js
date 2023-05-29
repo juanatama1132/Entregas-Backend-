@@ -13,8 +13,6 @@ dotenv.config({
       ? "../.env.developement"
       : "../.env.production",
 });
-// console.log(`Enviroment
-// ${process.env.PERSISTENCE}`);
 const url =
   process.env.MONGO_URL ||
   "mongodb+srv://fegysin:Atlas2903db@cluster0.nx5ys0f.mongodb.net/ecommerce?retryWrites=true&w=majority";
@@ -27,6 +25,10 @@ let CfgObject = {
   persistence: process.env.PERSISTENCE,
   appEnv: process.env.enviroment,
   dbConnection: () => MongoSingleton.getInstance(url),
+  mail_service: process.env.MAIL_SERVICE,
+  mail_port: process.env.MAIL_PORT,
+  mail_user: process.env.MAIL_USER,
+  mail_password: process.env.MAIL_PASSWORD,
   session: {
     store: MongoStore.create({
       mongoUrl: url,

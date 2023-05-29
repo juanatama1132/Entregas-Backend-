@@ -2,6 +2,7 @@ import { Router } from "express";
 import { CartClass } from "../controlers/cart.controler.js";
 const cartClass = new CartClass();
 import { auth } from "../middleware/auth.js";
+import { authToken } from "../utils/jsonwt.js";
 //import CartManager from "../Dao/cartMannager.js";
 const router = Router();
 // const Carts = []; //id=0, products=[]
@@ -36,12 +37,22 @@ const router = Router();
 //   }
 // };
 router
-  .get("/", cartClass.getCarts)
-  .get("/:cId", cartClass.getCartById)
-  .get(":cId/purchase", cartClass.buyCart)
-  .post("/products/:pId", auth("user"), cartClass.createCart)
-  .put("/:cId/products/:pId", auth("user"), cartClass.updateCart)
-  .delete("/:cId", auth("user"), cartClass.deleteCart);
+  .get("/", authToken, cartClass.getCarts)
+  .get("/:cId", authToken, cartClass.getCartById)
+  .get(":cId/purchase", authToken, cartClass.buyCart)
+  .post(
+    "/products/:pId",
+    authToken,
+    auth(["user", "premium"]),
+    cartClass.createCart
+  )
+  .put(
+    "/:cId/products/:pId",
+    authToken,
+    auth(["user", "premium"]),
+    cartClass.updateCart
+  )
+  .delete("/:cId", authToken, auth(["user", "premium"]), cartClass.deleteCart);
 
 // router.get("/:cId", (req, res) => {
 //   const { cId } = req.params;

@@ -1,10 +1,15 @@
-function auth(req, res, next) {
-  console.log("auth: ", req.session);
-  if (req.session?.user.name !== "fede fede") {
-    return res.send("No estas autorizado para ver esta página, por favor");
-  }
-
-  return next();
-}
+const auth = (role) => {
+  return (async) => (req, res, next) => {
+    if (!req.user)
+      return res.status(401).json({ status: "error", error: "Unauthorized" });
+    const authorised = role.includes(req.user.role);
+    if (!authorised)
+      // if (req.user.role !== role)
+      return res
+        .status(403)
+        .json({ status: "error", error: "Not enought permissions" });
+    return next();
+  };
+};
 
 export { auth };

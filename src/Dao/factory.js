@@ -10,6 +10,7 @@ let CartDao;
 switch (CfgObject.persistence) {
   case "MONGO":
     CfgObject.dbConnection();
+    // ProductDao =await import("./mongoDb/productManager.js")
     ProductDao = ProductMannager;
     UserDao = UserMannager;
     CartDao = CartMannager;

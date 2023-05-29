@@ -30,11 +30,24 @@ export class CartClass {
     return res.status(200).send(cart);
   };
 
+  hasPermit = (pId, role, eMail) => {
+    if (role !== "user") {
+      const product = productService.getProductbyId(pId);
+      if (!product || product.owner === eMail) return false;
+    }
+    return true;
+  };
+
   createCart = async (req, res) => {
-    console.log(req.user);
+    // console.log(req.user);
     const uId = req.user._id;
     const { pId } = req.params;
     req.body = Object.assign({}, { uId }, { pId }, req.body);
+    if (!this.hasPermit(pId, req.user.role, req.user.eMail))
+      res.status(400).send({
+        status: "error",
+        error: "No puede Agregar este Producto al carrito",
+      });
     try {
       const cart = cartService.createCart(req.body);
       return cart;
@@ -52,6 +65,11 @@ export class CartClass {
         .status(400)
         .send({ status: "error", error: "Faltan Parametos en la Solicitud" });
     }
+    if (!this.hasPermit(pId, req.user.role, req.user.eMail))
+      res.status(400).send({
+        status: "error",
+        error: "No puede Agregar este Producto al carrito",
+      });
 
     try {
       req.body = Object.assign({}, { cId }, { pId }, req.body);

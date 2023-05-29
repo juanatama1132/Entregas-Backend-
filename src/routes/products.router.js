@@ -1,17 +1,30 @@
 import { Router } from "express";
 import { ProductClass } from "../controlers/products.controler.js";
-import { auth } from "../middleware/auth.js";
-import { generateMockProducts } from "../mocking/products.mock.js";
-
+import { authToken } from "../utils/jsonwt.js";
 const productClass = new ProductClass();
 const router = Router();
 router.get("/", productClass.getProducts);
 // router.get("/:pId", productClass.getProductbyId);
-router.get("/:pCode", productClass.getProductByCode);
-router.get("/mockingproducts", productClass.getMockingProducts);
-router.post("/", auth("user"), productClass.createProduct);
-router.put("/:pId", auth("user"), productClass.updateProduct);
-router.delete("/:pId", auth("user"), productClass.deleteProduct);
+router.get("/:pCode", authToken, productClass.getProductByCode);
+router.get("/mockingproducts", authToken, productClass.getMockingProducts);
+router.post(
+  "/",
+  authToken,
+  auth(["admin", "premium"]),
+  productClass.createProduct
+);
+router.put(
+  "/:pId",
+  authToken,
+  auth(["admin", "premium"]),
+  productClass.updateProduct
+);
+router.delete(
+  "/:pId",
+  authToken,
+  auth(["admin", "premium"]),
+  productClass.deleteProduct
+);
 
 // router.get("/", async (req, res) => {
 //   // console.log(req.params);

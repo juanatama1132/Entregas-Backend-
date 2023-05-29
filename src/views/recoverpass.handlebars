@@ -1,0 +1,12 @@
+<h2>Recuperar Password</h2>
+<div>
+    <form action="/recoverpass" method="POST">
+       <input type="password" name="password" id="password">
+       <input type="password" name="rePassword" id="rePassword">
+        <button type="submit">Recuperar</button>
+    </form>
+{{#if !objRecovery.status}}
+<p>{{objRecovery.message}}</p>
+<a href="/api/products?page={{prodList.nextPage}}"><button>Siguiente Pagina</button></a>
+{{/if}}
+</div>

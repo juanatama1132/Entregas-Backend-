@@ -40,7 +40,7 @@ export class ProductClass {
       res.status(400).send({
         message: "Faltan Datos sobre el Producto, Transaccion Cancelada",
       });
-
+    req.body = Object.assign({}, { owner: req.user.eMail }, req.body);
     // console.log("Post");
     try {
       await productService.addProduct(req.body);
@@ -56,6 +56,10 @@ export class ProductClass {
   updateProduct = async (req, res) => {
     const { pId } = req.params;
     const { code, description, stock } = req.body;
+    if (!this.hasPermit(pId, req.user.role, req.user.eMail))
+      res
+        .status(400)
+        .send({ message: "No Tiene Permisos para Eliminar Producto" });
     if (!code || !description || !stock) {
       res.status(400).send({
         message: `Faltan enviar datos del Producto ${
@@ -65,6 +69,7 @@ export class ProductClass {
         }`,
       });
       req.body = Object.assign({}, { pId }, req.body);
+
       try {
         await productService.modProduct(req.body);
         res.status(200).send({ message: "Producto Actualizado Correctamente" });
@@ -76,9 +81,21 @@ export class ProductClass {
     }
   }; //Modify Product Data (Detail, Stock, Price)
 
+  hasPermit = async (pId, role, eMail) => {
+    if (role !== "admin") {
+      const product = productService.getProductbyId(pId);
+      if (!product || product.owner !== eMail) return false;
+    }
+    return true;
+  };
+
   deleteProduct = async (req, res) => {
     const { pId } = req.params;
     try {
+      if (!this.hasPermit(pId, req.user.role, req.user.eMail))
+        res
+          .status(400)
+          .send({ message: "No Tiene Permisos para Eliminar Producto" });
       await productService.delProduct(pId);
       return res
         .status(200)
