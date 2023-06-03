@@ -18,9 +18,25 @@ import { initializePassport } from "./middleware/initialPassport.js";
 import passport from "passport";
 import { addLogger } from "./utils/logger.js";
 
+import { swaggerJsDoc } from "swagger-jsdoc";
+import { swaggerUiExpress } from "swagger-ui-express";
+
 const app = express();
 const httpServer = new HttpServer.Server(app);
 const io = new Server(httpServer);
+
+const swaggerOptions = {
+  definition: {
+    openapi: "3.0.1",
+    info: {
+      title: "Documentación de nuestra app Adoptame",
+      description: "Api pensada para adopción de mascotas",
+    },
+  },
+  apis: [`${__dirname}/docs/**/*.yaml`],
+};
+const specs = swaggerJsDoc(swaggerOptions);
+
 CfgObject.dbConnection();
 
 app.use("/virtual", express.static(__dirname + "/public"));
@@ -28,10 +44,11 @@ app.use(express.json());
 app.use(urlencoded({ extended: true }));
 app.use(cors());
 app.use(cookieParser());
-app.use(compression({
-    brotli:{enabled:true,
-    zLib:{}}
-}))
+app.use(
+  compression({
+    brotli: { enabled: true, zLib: {} },
+  })
+);
 initializePassport();
 app.use(passport.initialize());
 
@@ -45,6 +62,8 @@ app.set("views", __dirname + "/views");
 app.set("view engine", "handlebars");
 
 app.use(useRouter);
+
+app.use("/apidocs", swaggerUiExpress.serve, swaggerUiExpress.setup(specs));
 
 initProductChatIo(io);
 

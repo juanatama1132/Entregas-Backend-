@@ -39,7 +39,7 @@ const router = Router();
 router
   .get("/", authToken, cartClass.getCarts)
   .get("/:cId", authToken, cartClass.getCartById)
-  .get(":cId/purchase", authToken, cartClass.buyCart)
+  .put(":cId/purchase", authToken, cartClass.buyCart)
   .post(
     "/products/:pId",
     authToken,

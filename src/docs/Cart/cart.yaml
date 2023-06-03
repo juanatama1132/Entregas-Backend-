@@ -1,0 +1,177 @@
+paths: 
+  /api/cart/:
+    get:
+      summary: Obtiene todos los carritos
+      tags: 
+        - Cart
+      responses:
+        "200":
+          description: Los carritos fueron obtenidos correctamente
+          content: 
+            applications/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Cart'
+        "500":
+          description: error interno del server , usualmente generado por una query defectuoso o un fallo con la base de datos. 
+    post:
+      summary: Crea un carrito nuevo
+      tags: 
+        - Cart
+      responses:
+        "201":
+          description: El carrito fue creado correctamente
+
+  /api/cart/{cid}:
+    get:
+      summary: Obtiene un carrito en base un id
+      tags: 
+        - Cart
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: El id del carrito que se desea solicitar
+          schema:
+            type: string
+      responses:
+        "200":
+          description: El carrito fué obtenido correctamente
+          content: 
+            applications/json:
+              schema:
+                  $ref: '#/components/schemas/Cart'
+    delete:
+      summary: Elimina un carrito en base un id
+      tags: 
+        - Cart
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: El id del carrito que se desea eliminar
+          schema:
+            type: string
+      responses:
+        "200":
+          description: El carrito fué eliminado correctamente
+  /api/cart/{cid}/purchase:
+      summary: Procesa el ticket de un carrito en base un id y lo marca como finalizado
+      tags: 
+        - Cart
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: El id del carrito que se desea finalizar
+          schema:
+            type: string
+      responses:
+        "200":
+          description: El carrito fué procesado correctamente
+  /api/cart/{cid}/products/{pid}:
+    put:
+      summary: se actualiza el contenido de un carrito por id
+      tags: 
+        - Cart
+      parameters:
+      - name: cid
+        in: path
+        required: true
+        description: El id del carrito actualizar
+      - name: pid
+        requiered: true
+        description: El id del producto a añadir al carrito
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content: 
+          application/json:
+            schema:
+              $ref: '#/components/requestBodies/updateCart'
+      responses:
+        "200":
+          description: El carrito fué actualizado correctamente
+          content: 
+            applications/json:
+              schema:
+                  $ref: '#/components/schemas/Cart'
+
+components: 
+  schemas: 
+    Cart:
+      type: object
+      properties: 
+        _id:
+          type: string
+          description: Id autogenerado por Mongo.
+        userId: 
+          type: String
+          description: id del Usuario en la base de Mongo coleccion Usuarios
+        cartId: 
+          type: String
+          description: codigo interno del carrito (Nro de Orden)
+        products: 
+          type: array
+          description: Array de Productos a comprar en el carrito por defecto es vacio
+          items:
+
+            prodId: 
+              type: String
+              description: _id Referencial de la coleccion Products de la base de Mongo
+            code:
+              type: String
+              description: Codigo interno del Producto
+            quantity:  
+              type: Number
+              description: Cantidad del Producto a comprar por defecto es 0
+        cartTotal: 
+          type: Number
+          description: Valor total del carrito por defecto es 0
+        purchased: 
+          type: Boolean
+          description: Estado del carrito, true es finalizado, false (valor por defecto) es activo
+      example: 
+
+        _id: ObjectId("asdlfkjasdofhbqaeljkasd.fasd45")
+        userId: 
+        cartId: 
+        products: 
+          -_id: ObjectId(640d2c3c99ebddf81c70f5da)
+          prodId: ObjectId(6405bc1fe3ffd11a1d7898e0)
+          code: ig-FuegFacil
+          quantity:  2
+
+        cartTotal: 1500
+        purchased: false
+
+  requestBodies: 
+    updateCart: 
+      type: object
+      properties:           
+        products: 
+          type: array
+          description: Array de Productos a comprar en el carrito por defecto es vacio
+          items:
+            prodId: 
+              type: String
+              description: _id Referencial de la coleccion Products de la base de Mongo
+            code:
+              type: String
+              description: Codigo interno del Producto
+            quantity:  
+              type: Number
+              description: Cantidad del Producto a comprar por defecto es 0
+        purchased: 
+          type: Boolean
+          description: Estado del carrito, true es finalizado, false (valor por defecto) es activo
+
+      example:   
+        products: 
+          -_id: ObjectId(640d2c3c99ebddf81c70f5da)
+          prodId: ObjectId(6405bc1fe3ffd11a1d7898e0)
+          code: ig-FuegFacil
+          quantity:  2
+        purchased: false        

@@ -23,6 +23,7 @@ const CartSchema = new Schema({
         quantity: { type: Number, default: 0 },
       },
     ],
+    default: [],
   },
   cartTotal: { type: Number, default: 0 },
   purchased: {

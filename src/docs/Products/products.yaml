@@ -1,0 +1,170 @@
+paths: 
+  /api/products/:
+    get:
+      summary: Obtiene todos los usuarios
+      tags: 
+        - Products
+      responses:
+        "200":
+          description: Los usuarios fueron obtenidos correctamente
+          content: 
+            applications/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        "500":
+          description: error interno del server , usalmente generado por una query defctuosa o un fallo con la base de datos. 
+    post:
+      summary: Crea un usuario nuevo
+      tags: 
+        - Products
+      requestBody:
+        required: true
+        content: 
+          application/json:
+            schema: 
+              $ref: '#/components/requestBodies/updateProduct'
+      responses:
+        "201":
+          description: Los usuarios fueron obtenidos correctamente
+
+  /api/products/{pCode}:
+    get:
+      summary: Obtiene un producto en base segun su codigo interno
+      tags: 
+        - Products
+      parameters:
+        - name: pCode
+          in: path
+          required: true
+          description: El codigo del producto que se desea solicitar
+          schema:
+            type: string
+      responses:
+        "200":
+          description: El producto fué obtenido correctamente
+          content: 
+            applications/json:
+              schema:
+                  $ref: '#/components/schemas/Product'
+  /api/products/{pid}:                
+    put:
+      summary: Actualiza datos del producto en base un id
+      tags: 
+        - Products
+      parameters:
+      - name: pid
+        in: path
+        required: true
+        description: El id del producto que se desea actualizar
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content: 
+          application/json:
+            schema:
+              $ref: '#/components/requestBodies/updateProduct'
+      responses:
+        "200":
+          description: El usuario fué actualizado correctamente
+          content: 
+            applications/json:
+              schema:
+                  $ref: '#/components/schemas/Product'
+    delete:    
+      summary: Marca como Inactivo un producto en base un id
+      tags: 
+        - Products
+      parameters:
+      - name: pid
+        in: path
+        required: true
+        description: El id del producto que se desea actualizar
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content: 
+          application/json:
+            schema:
+              $ref: '#/components/requestBodies/updateProduct'
+      responses:
+        "200":
+          description: El pruducto fue marcado para borrar
+components: 
+  schemas: 
+    product:
+      type: object
+      properties: 
+        _id:
+          type: string
+          description: Id autogenerado por Mongo.
+        title:
+          type: string
+          description: Nombre del Producto.
+        description:
+          type: string
+          description: Descripcion del Producto.
+        code:
+          type: string
+          description: El codigo interno del porducto, este campo es único y no puede repetirse
+        price:
+          type: number
+          description: El Precio de venta  
+        status:
+          type: boolean
+          description: Estado del Producto, True para activo False para no Activo. Por defecto es True
+        stock:
+          type: number
+          description: Cantidad del producto en Stock
+        category:
+          type: string
+          description: Categoria del Producto
+        owner:
+          type: string
+          description: propietario del producto, por defecto el valor es admin
+        thumbnails:
+          type: array
+          description: array de links a imagenes del producto
+
+      example: 
+        _id: ObjectId("asdlfkjasdofhbqaeljkasd.fasd45")
+        title: madera de Pino 
+        description: madera de Pino por metro
+        code:  md-pino
+        price: 250
+        status: true
+        stock: 25
+        category: maderas
+        owner: admin
+        thumbnails: []
+
+  requestBodies: 
+    updateProduct: 
+      type: object
+      properties:           
+        description:
+          type: string
+          description: Descripcion del Producto.
+        price:
+          type: number
+          description: El Precio de venta  
+        status:
+          type: boolean
+          description: Estado del Producto, True para activo False para no Activo. Por defecto es True
+        stock:
+          type: number
+          description: Cantidad del producto en Stock
+        owner:
+          type: string
+          description: propietario del producto, por defecto el valor es admin. Solo el admin deberia cambiar la propiedad
+
+      example:           
+        description: madera de Pino por peso
+        price: 350
+        status: true
+        stock: 25
+        owner: admin
+      
