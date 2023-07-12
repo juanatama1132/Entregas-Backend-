@@ -4,24 +4,12 @@ import { faker } from "@faker-js/faker";
 // import { Jwt } from "jsonwebtoken";
 import express from "express";
 import authRouter from "../routes/auth.router.js";
-import { AuthClass } from "../controlers/auth.controler";
+import { AuthClass } from "../controlers/auth.controler.js";
 import { createHash } from "crypto";
 const expect = chai.expect;
 const requester = supertest("http://localhost:8080");
 const userServiceMock = {
   getUserByEmail: async (eMail) => await AuthClass.getUserByEmail(eMail),
-  //   {
-
-  //     const user = {
-  //       firstName: "",
-  //       lastName: "",
-  //       eMail: "",
-  //       age: 47,
-  //       password: "",
-  //       role: "",
-  //     };
-  //     return Promise.resolve(user);
-  //   },
 };
 describe("Test Auth Router", () => {
   let app;

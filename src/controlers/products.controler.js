@@ -5,6 +5,7 @@ export class ProductClass {
   getProducts = async (req, res) => {
     try {
       const prodList = await productService.getProducts(req.query);
+      // prodList=Object.assign({},req.user._id,{prodList})
       res.render("products", { prodList, style: "products.css" });
     } catch (error) {
       console.log(error);
@@ -26,7 +27,7 @@ export class ProductClass {
     const { pCode } = req.params;
     try {
       const product = productService.getProductByCode(pCode);
-      console.log(product);
+      // console.log(product);
       if (!product) res.status(400).send("Producto invalido o inexistente");
       res.status(201).send(product);
     } catch (error) {

@@ -7,7 +7,7 @@ export class CartClass {
       res
         .status(400)
         .send({ status: "error", error: "No Hay Carritos Activos" });
-    return res.status(200).send(carts);
+    res.status(200).send({ status: "ok", payload: carts });
   };
 
   getCartById = async (req, res) => {
@@ -17,7 +17,7 @@ export class CartClass {
       res
         .status(400)
         .send({ status: "error", error: "Carrito invalido o inexistente" });
-    return res.status(200).send(cart);
+    res.status(200).send({ status: "ok", payload: cart });
   }; //Get Cart
 
   getCartByUid = async (req, res) => {
@@ -27,7 +27,7 @@ export class CartClass {
       res
         .status(400)
         .send({ status: "error", error: "Carrito invalido o inexistente" });
-    return res.status(200).send(cart);
+    res.status(200).send({ status: "ok", payload: cart });
   };
 
   hasPermit = (pId, role, eMail) => {
@@ -50,9 +50,9 @@ export class CartClass {
       });
     try {
       const cart = cartService.createCart(req.body);
-      return cart;
+      res.status(200).send({ status: "ok", payload: cart });
     } catch (error) {
-      return res
+      res
         .status(400)
         .send({ status: "error", error: "No se pudo crear carrito" });
     }
@@ -61,7 +61,7 @@ export class CartClass {
   updateCart = async (req, res) => {
     const { cId, pId } = req.params;
     if (!cId || !pId) {
-      return res
+      res
         .status(400)
         .send({ status: "error", error: "Faltan Parametos en la Solicitud" });
     }
@@ -74,9 +74,9 @@ export class CartClass {
     try {
       req.body = Object.assign({}, { cId }, { pId }, req.body);
       await cartService.updateCart(req.body);
-      return res.status(200).send("Carrito Modificado");
+      res.status(200).send({ status: "ok", message: "Carrito Modificado" });
     } catch (error) {
-      return res
+      res
         .status(400)
         .send({ status: "error", error: "Faltan Parametos en la Solicitud" });
     }
@@ -86,17 +86,20 @@ export class CartClass {
     const { cId } = req.params;
     try {
       await cartService.delCart(cId);
-      return res.status(200).send("Carrito Eliminado");
+      res.status(200).send({ status: "ok", message: "Carrito Eliminado" });
     } catch (error) {
-      return res.status(401).send({
+      res.status(401).send({
         status: "error",
         error: `No se pudo eliminar Carrito ${error}`,
       });
     }
   };
+
   buyCart = async (req, res) => {
     const { cId } = req.params;
-    await cartService.buyCart(cId);
+    try {
+      await cartService.buyCart(cId);
+    } catch (error) {}
   };
 }
 

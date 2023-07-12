@@ -3,7 +3,7 @@ import { generateToken } from "../utils/jsonwt.js";
 import { isValidPassword, createHash } from "../utils/bCrypt.js";
 import SendmailTransport from "nodemailer/lib/sendmail-transport/index.js";
 import { sendMail } from "../utils/sendMail.js";
-
+import { userDTO } from "../dto/user.dto.js";
 export class AuthClass {
   navLogIn = async (req, res) => {
     res.status(200).render("login");
@@ -22,8 +22,9 @@ export class AuthClass {
         .status(401)
         .send({ status: "error", error: "Usuario Password Invalido" });
 
-    const { password: pass, ...rest } = user;
-    const token = generateToken(rest);
+    // const { password: pass, ...rest } = user;
+    const tokenUser = userDTO.tokenUser(user);
+    const token = generateToken(tokenUser);
 
     res
       .cookie("coderCookieToken", token, { maxAge: 60 * 60 * 1000 })

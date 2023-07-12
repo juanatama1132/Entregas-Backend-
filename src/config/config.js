@@ -1,5 +1,4 @@
 import MongoStore from "connect-mongo";
-// import { connect, set } from "mongoose";
 import dotenv from "dotenv";
 import { commander } from "../utils/commander.js";
 import { MongoSingleton } from "./mongoSingleton.js";
@@ -13,9 +12,7 @@ dotenv.config({
       ? "../.env.developement"
       : "../.env.production",
 });
-const url =
-  process.env.MONGO_URL ||
-  "mongodb+srv://fegysin:Atlas2903db@cluster0.nx5ys0f.mongodb.net/ecommerce?retryWrites=true&w=majority";
+const url = process.env.MONGO_URL || "mongodb://localhost:27017";
 
 let CfgObject = {
   PORT: process.env.PORT || 8080,
@@ -42,5 +39,6 @@ let CfgObject = {
     resave: false,
     saveUninitialized: false,
   },
+  jwt_Private_Key: process.env.JWT_PRIVATE_KEY,
 };
 export { CfgObject };

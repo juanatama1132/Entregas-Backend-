@@ -18,8 +18,8 @@ import { initializePassport } from "./middleware/initialPassport.js";
 import passport from "passport";
 import { addLogger } from "./utils/logger.js";
 
-import { swaggerJsDoc } from "swagger-jsdoc";
-import { swaggerUiExpress } from "swagger-ui-express";
+import swaggerJSDoc from "swagger-jsdoc";
+import swaggerUiExpress from "swagger-ui-express";
 
 const app = express();
 const httpServer = new HttpServer.Server(app);
@@ -35,7 +35,7 @@ const swaggerOptions = {
   },
   apis: [`${__dirname}/docs/**/*.yaml`],
 };
-const specs = swaggerJsDoc(swaggerOptions);
+const specs = swaggerJSDoc(swaggerOptions);
 
 CfgObject.dbConnection();
 

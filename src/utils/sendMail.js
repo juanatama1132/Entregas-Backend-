@@ -1,5 +1,5 @@
 import { createTransport } from "nodemailer";
-import { CfgObject } from "../config/config";
+import { CfgObject } from "../config/config.js";
 
 const transport = createTransport({
   service: CfgObject.mail_service,

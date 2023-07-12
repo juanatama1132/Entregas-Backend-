@@ -4,5 +4,3 @@ const createHash = (password) =>
 const isValidPassword = (user, password) =>
   bcrypt.compareSync(password, user.password);
 export { createHash, isValidPassword };
-// exports.createHash = createHash;
-// exports.isPwdValid = isPwdValid;

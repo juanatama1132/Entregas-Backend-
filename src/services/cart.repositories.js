@@ -1,3 +1,7 @@
+import mongoose from "mongoose";
+import { CfgObject } from "../config/config.js";
+// import { ocnnMongo } from "../config/mongoSingleton.js";
+
 export class CartRepositories {
   constructor(cartDao) {
     this.cartDao = cartDao;
@@ -18,11 +22,12 @@ export class CartRepositories {
 
   updateCart = async (cart) => {
     let { uId, cId, prodId, cartTotal, code, price, quantity } = cart;
-
     uId = !uId ? 1 : uId;
     cartTotal = !cartTotal ? price : cartTotal;
     cId = !cId ? 1 : cId;
     quantity = !quantity ? 1 : quantity;
+
+    // const mongoSession = ocnnMongo.startSession();
 
     if (!this.cartDao.cartExist(uId, cId)) {
       let products = [];
@@ -30,72 +35,82 @@ export class CartRepositories {
       products.push(product);
       const nWreg = Object.assign({}, { products }, params);
     } else {
-      const objUpdate = {
-        filter: { userId: uId, cartId: cId },
-        query: {
-          $inc: {
-            "products.$[elm].quantity": quantity,
-          },
-        },
-        options: {
-          arrayFilters: [{ "elm.code": code }],
-        },
-      };
-      const result = await this.CartDao.updateCart(objUpdate);
-      if (result.modifiedCount > 0) {
-        objUpdate.query = {
-          $inc: {
-            cartTotal: price * quantity,
-          },
-        };
-        objUpdate.options = "";
-        await this.CartDao.updateCart(objUpdate);
+      try {
+        // (await mongoSession).startTransaction();
 
-        // await CartDao.updateOne(
-        //   { userId: uId, cartId: cId },
-        //   {
-        //     $inc: {
-        //       cartTotal: price * quantity,
-        //     },
-        //   }
-        // );
-      } else {
-        objUpdate.query = {
-          $inc: {
-            cartTotal: price * quantity,
-          },
-          $addToSet: {
-            products: {
-              prodId: prodId,
-              code: code,
-              quantity: quantity,
+        const objUpdate = {
+          filter: { userId: uId, cartId: cId },
+          query: {
+            $inc: {
+              "products.$[elm].quantity": quantity,
             },
           },
+          options: {
+            // arrayFilters: [{ "elm.code": code }, { session: mongoSession }],
+            arrayFilters: [{ "elm.code": code }],
+          },
         };
-        objUpdate.options = {
-          arrayFilters: [{ "elm.code": code }],
-        };
-        await this.CartDao.updateCart(objUpdate);
-        //     await CartDao.updateOne(
-        //       { userId: uId, cartId: cId },
-        //       {
-        //         $inc: {
-        //           cartTotal: price * quantity,
-        //         },
-        //         $addToSet: {
-        //           products: {
-        //             prodId: prodId,
-        //             code: code,
-        //             quantity: quantity,
-        //           },
-        //         },
-        //       },
-        //       {
-        //         arrayFilters: [{ "elm.code": code }],
-        //       }
-        //     );
-        //   }
+        const result = await this.CartDao.updateCart(objUpdate);
+        if (result.modifiedCount > 0) {
+          objUpdate.query = {
+            $inc: {
+              cartTotal: price * quantity,
+            },
+          };
+          //  objUpdate.options = [{ session: mongoSession }];
+          objUpdate.options = [];
+          await this.CartDao.updateCart(objUpdate);
+
+          // await CartDao.updateOne(
+          //   { userId: uId, cartId: cId },
+          //   {
+          //     $inc: {
+          //       cartTotal: price * quantity,
+          //     },
+          //   }
+          // );
+        } else {
+          objUpdate.query = {
+            $inc: {
+              cartTotal: price * quantity,
+            },
+            $addToSet: {
+              products: {
+                prodId: prodId,
+                code: code,
+                quantity: quantity,
+              },
+            },
+          };
+          objUpdate.options = {
+            arrayFilters: [{ "elm.code": code }],
+          };
+          await this.CartDao.updateCart(objUpdate);
+          //     await CartDao.updateOne(
+          //       { userId: uId, cartId: cId },
+          //       {
+          //         $inc: {
+          //           cartTotal: price * quantity,
+          //         },
+          //         $addToSet: {
+          //           products: {
+          //             prodId: prodId,
+          //             code: code,
+          //             quantity: quantity,
+          //           },
+          //         },
+          //       },
+          //       {
+          //         arrayFilters: [{ "elm.code": code }],
+          //       }
+          //     );
+          //   }
+        }
+        // (await mongoSession).commitTransaction();
+      } catch (error) {
+        // (await mongoSession).abortTransaction;
       }
+      // (await mongoSession).endSession();
       return await this.CartDao.getCartById(cId).lean();
     }
   };

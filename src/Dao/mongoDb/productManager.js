@@ -36,14 +36,15 @@ export class ProductMannager {
 
   updateProduct = async (updObject) => {
     // (id, code, description, stock)
-    const { filter, query, options } = updObject;
+    const { filter, query, options, session } = updObject;
 
     return await ProductModel.updateOne(
       // { _id: id },
       // { description, stock, status: true }
       filter,
       query,
-      options
+      options,
+      session
     );
   };
 

@@ -1,5 +1,5 @@
 import winston from "winston";
-import { CfgObject } from "../config/config";
+import { CfgObject } from "../config/config.js";
 const customLevelOptions = {
   levels: {
     fatal: 0,
